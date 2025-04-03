@@ -20,7 +20,7 @@ To run this script you need to things
    d. this file should also be named {protein}_rest_of_csv.csv
       1. this is so that file outputs can be named with the protein name they are associated
 2. The PDB of your protein
-   a. The script uses this protein file to extract residue names and is used to order the residue labels
-   b. the schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
+   i. The script uses this protein file to extract residue names and is used to order the residue labels
+   ii. the schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
    
 
