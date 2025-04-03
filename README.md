@@ -26,3 +26,4 @@ To run this script you need to things
     - The script uses this protein file to extract residue names and is used to order the residue labels
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
 
+In the example_data folder, there is a protein.pdb and a fingerprint.csv that work with this script.
