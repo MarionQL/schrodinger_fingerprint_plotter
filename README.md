@@ -26,4 +26,21 @@ To run this script you need to things
     - The script uses this protein file to extract residue names and is used to order the residue labels
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
 
-In the example_data folder, there is a protein.pdb and a fingerprint.csv that work with this script.
+Flags:
+
+Required:
+
+1. -i --interaction: this filters for different interactions, contact will give you all interactions, you can also get backbone or sidechain, or interaction type (polar, charged, donor, acceptor, hydrophobic, aromatic)
+  - these interactions are all determined by schrodinger, so if there are errors in interaction type, there may be a problem with how you ran fingerprinting in Schrodinger
+2. -g --graph: You can choose to generate a heatmap or a bar graph, examples of what these options look like are in the example_data folder
+
+Optional:
+1. -ic --ignore-chain: this flag will remove the chain letter from the residue name in the graph, this is not recommended if the protein has multiple chains
+2. -s --show: this will show the graph in matplotlib as the graphs are created
+
+In the example_data folder, there is a protein.pdb and a fingerprint.csv that work with this script and the heatmap and bar graphs that are output
+These are the commands used to generate those graphs:
+
+`python plot_schrodinger_fingerprints.py mfsd2b_fingerprint.csv mfsd2b.pdb -i contact -g bar -ic`
+
+`python plot_schrodinger_fingerprints.py mfsd2b_fingerprint.csv mfsd2b.pdb -i contact -g heatmap -ic`
