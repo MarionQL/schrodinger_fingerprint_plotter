@@ -222,7 +222,7 @@ if __name__ == "__main__":
             "This script will generate a heatmap and bar graphs from Schrodinger fingerprint CSV files.\n"
             "Supports multiple ligands per file!\n\n"
             "Example Command:\n"
-            "  python plot_schrodinger_fingerprints.py fingerprint.csv protein.pdb -i contact -g bar\n\n"
+            "  python plot_schrodinger_fingerprints.py protein_fingerprint.csv protein.pdb -i contact -g bar\n\n"
             "This script assumes that the CSV file is formatted with the protein name first:\n"
             "  {protein}_rest_of_name.csv\n\n"
             "Additionally, the first column in your CSV must be one of the following formats:\n"
