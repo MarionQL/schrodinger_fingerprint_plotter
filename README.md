@@ -9,7 +9,7 @@ This code:
 5. Counts interaction frequencies for each ligand-residue pair
 6. Generates bar plots and heatmaps for selected interaction types
 
-To run this script you need to things
+To run this script you need two things
 1. The CSV from schrodinger
    - this csv can have as many ligands as you want
    - if you make a heatmap, all ligands will be included, if you make a bar graph, each ligand will be placed in its own bargraph
