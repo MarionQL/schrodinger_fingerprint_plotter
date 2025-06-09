@@ -12,7 +12,7 @@ def load_data(file_path):
     '''
     arg: file_path (str) is path to CSV from user input
     returns: pandas dataframe of the CSV'''
-    return pd.read_csv(file_path, dtype=str)
+    return pd.read_csv(file_path, dtype=str, keep_default_na=Flase)
 
 def extract_ligand(df):
     '''extracts ligand from the first column, can handle these ligand formats in the csv:
