@@ -90,7 +90,7 @@ def count_interactions(df, contact_columns, residue_mapping):
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
             else:
-                if pd.notna(value) and str(value).strip() != '':
+                if value != '':
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
