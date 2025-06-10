@@ -12,7 +12,7 @@ def load_data(file_path):
     '''
     arg: file_path (str) is path to CSV from user input
     returns: pandas dataframe of the CSV'''
-    return pd.read_csv(file_path, dtype=str, keep_default_na=False)
+    return pd.read_csv(file_path, low_memory=False)
 
 def extract_ligand(df):
     '''extracts ligand from the first column, can handle these ligand formats in the csv:
@@ -90,7 +90,7 @@ def count_interactions(df, contact_columns, residue_mapping):
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
             else:
-                if value != '':
+                if pd.notna(value) and str(value).strip() != '':
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
