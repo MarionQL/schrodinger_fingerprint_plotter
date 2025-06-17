@@ -165,7 +165,7 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_resid
         x_pos = range(len(sorted_residues))
         bar_ax.bar(x_pos, residue_counts, color='grey', edgecolor='black', align='center')
         bar_ax.set_xticks(x_pos)
-        bar_ax.setxticklabels(sorted_residues, rotation=90, fontsize=8)
+        bar_ax.set_xticklabels(sorted_residues, rotation=90, fontsize=8)
         bar_ax.set_xticks([])
         bar_ax.set_yticks([])
         bar_ax.set_xlim(-0.5, len(sorted_residues)-0.5)
@@ -208,7 +208,7 @@ def bar_graph(interaction_df, sorted_residues, ligands, protein, show):
         if show:
             plt.show()
 
-def process_interaction_data(csv_file, pdb_file, interaction, ignore_chain, show, graph):
+def process_interaction_data(csv_file, pdb_file, interaction, ignore_chain, show, graph, bar):
     '''
     csv_file: csv file path (str)
     pdb_file: pdb_file path (str)
@@ -222,14 +222,14 @@ def process_interaction_data(csv_file, pdb_file, interaction, ignore_chain, show
     filename = os.path.basename(csv_file)
     protein = filename.split('_')[0]  # assumes format: protein_ligand_data.csv
     residue_mapping, residue_order = extract_pdb_residues(pdb_file, ignore_chain)
-    interaction_counts = count_interactions(df, contact_columns, residue_mapping)
+    interaction_counts, total_residue_counts = count_interactions(df, contact_columns, residue_mapping)
     if not interaction_counts:
         print(f'No {interaction} interactions found')
         return
     interaction_df = create_interaction_dataframe(interaction_counts)
     sorted_residues = sort_residues(interaction_df, residue_order)
     if graph == 'heatmap':
-        heatmap(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show)
+        heatmap(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show, total_residue_counts, bar)
     elif graph == 'bar':
         bar_graph(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show)
 
@@ -258,6 +258,6 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--graph", type=str, choices=["bar", "heatmap"], help="Type of graph")
     parser.add_argument('-ic', "--ignore-chain", action="store_true", help="Ignore chain IDs in residue labels.")
     parser.add_argument("-s", "--show", action="store_true", help="Shows the plots as they are plotted in Matplotlib") 
-    parser.add_argument("-bar", "--bar", action="store_true", help="Adds a bar graph of overall interaction propensity to the top of the heatmap"
+    parser.add_argument("-bar", "--bar", action="store_true", help="Adds a bar graph of overall interaction propensity to the top of the heatmap")
     args = parser.parse_args()
     process_interaction_data(args.csv_file, args.pdb_file, args.interaction, args.ignore_chain, args.show, args.graph, args.bar)
