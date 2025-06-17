@@ -76,6 +76,7 @@ def count_interactions(df, contact_columns, residue_mapping):
     returns: dictionary with (ligand, residue) keys and interaction counts
     '''
     interaction_counts = {}
+    total_residue_counts = {}
 
     first_col = contact_columns[0]
     first_val = df[first_col].iloc[1]
@@ -89,12 +90,14 @@ def count_interactions(df, contact_columns, residue_mapping):
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
+                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) +1
             else:
                 if pd.notna(value) and str(value).strip() != '':
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
-    return interaction_counts
+                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) +1
+    return interaction_counts, total_residue_counts
 
 
 def create_interaction_dataframe(interaction_counts):
@@ -116,13 +119,14 @@ def sort_residues(interaction_df, residue_order):
     )
     return sorted_residues
 
-def heatmap(interaction_df, sorted_residues, ligands, protein, show):
+def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_residue_counts, bar):
     '''creates and saves a heatmap from the interaction df with correctly sorted x-ticks
     arg: interaction_df is the dataframe with the interaction counts
     arg: sorted_residues (list) is the residue labels in order
     arg: ligands (list) is the ligand names
     arg: protein (str) has the protein name to label the output files
     arg: show (bool) specified by user and if true it will display a heatmap'''
+    
     heatmap_data = interaction_df.pivot(index='Ligand', columns='Residue', values='Count').fillna(0)
     heatmap_data = heatmap_data.reindex(index=ligands)
     heatmap_data = heatmap_data[sorted_residues]
@@ -148,11 +152,24 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show):
         spine.set_visible(True)  
         spine.set_color('black') 
         spine.set_linewidth(1.25)
+        
     plt.xticks(rotation=90, fontsize=16)
     ax.set_xticklabels(sorted_residues, fontsize=16)  
     ax.set_yticklabels(ligands, fontsize=16)
     plt.ylabel('Ligand', fontsize=18, fontweight='bold')
     plt.xlabel('Residue', fontsize=18, fontweight='bold')
+    # adds bar graph to top of heatmap
+    if bar:
+        residue_counts = [total_residue_counts.get(res, 0) for res in sorted_residues]
+        bar_ax = ax.inset_axes([0, 1.02, 1, 0.25])
+        x_pos = range(len(sorted_residues))
+        bar_ax.bar(x_pos, residue_counts, color='grey', edgecolor='black', align='center')
+        bar_ax.set_xticks(x_pos)
+        bar_ax.setxticklabels(sorted_residues, rotation=90, fontsize=8)
+        bar_ax.set_xticks([])
+        bar_ax.set_yticks([])
+        bar_ax.set_xlim(-0.5, len(sorted_residues)-0.5)
+
     plt.tight_layout()
     plt.savefig(f'{protein}_interaction_heatmap.png', dpi=300)
     if show:
@@ -240,6 +257,7 @@ if __name__ == "__main__":
         help="Type of interaction to plot")
     parser.add_argument("-g", "--graph", type=str, choices=["bar", "heatmap"], help="Type of graph")
     parser.add_argument('-ic', "--ignore-chain", action="store_true", help="Ignore chain IDs in residue labels.")
-    parser.add_argument("-s", "--show", action="store_true", help="Shows the plots as they are plotted in Matplotlib")   
+    parser.add_argument("-s", "--show", action="store_true", help="Shows the plots as they are plotted in Matplotlib") 
+    parser.add_argument("-bar", "--bar", action="store_true", help="Adds a bar graph of overall interaction propensity to the top of the heatmap"
     args = parser.parse_args()
-    process_interaction_data(args.csv_file, args.pdb_file, args.interaction, args.ignore_chain, args.show, args.graph)
+    process_interaction_data(args.csv_file, args.pdb_file, args.interaction, args.ignore_chain, args.show, args.graph, args.bar)
