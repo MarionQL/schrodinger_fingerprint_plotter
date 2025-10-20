@@ -32,7 +32,8 @@ Flags:
 Required:
 
 1. -i --interaction: this filters for different interactions, contact will give you all interactions, you can also get backbone or sidechain, or interaction type (polar, charged, donor, acceptor, hydrophobic, aromatic, all)
-  - these interactions are all determined by schrodinger, so if there are errors in interaction type, there may be a problem with how you ran fingerprinting in Schrodinger. All is a special interaction type that will tell the script to run all interaction types in one command. 
+  - these interactions are all determined by schrodinger, so if there are errors in interaction type, there may be a problem with how you ran fingerprinting in Schrodinger.
+  - All is a special interaction type that will tell the script to run all interaction types in one command. 
 2. -g --graph: You can choose to generate a heatmap or a bar graph, examples of what these options look like are in the example_data folder
 
 Optional:
