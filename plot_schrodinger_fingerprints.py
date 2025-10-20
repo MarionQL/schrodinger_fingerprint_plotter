@@ -119,7 +119,7 @@ def sort_residues(interaction_df, residue_order):
     )
     return sorted_residues
 
-def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_residue_counts, bar):
+def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_residue_counts, bar, interaction):
     '''creates and saves a heatmap from the interaction df with correctly sorted x-ticks
     arg: interaction_df is the dataframe with the interaction counts
     arg: sorted_residues (list) is the residue labels in order
@@ -171,11 +171,11 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_resid
         bar_ax.set_xlim(-0.5, len(sorted_residues)-0.5)
 
     plt.tight_layout()
-    plt.savefig(f'{protein}_interaction_heatmap.png', dpi=300)
+    plt.savefig(f'{protein}_{interaction}_interaction_heatmap.png', dpi=300)
     if show:
         plt.show()
 
-def bar_graph(interaction_df, sorted_residues, ligands, protein, show):
+def bar_graph(interaction_df, sorted_residues, ligands, protein, show, interaction):
     '''its a bar graph
     arg: interaction_df is the dataframe with the interaction counts
     arg: sorted_residues (list) is the residue labels in order
@@ -204,7 +204,7 @@ def bar_graph(interaction_df, sorted_residues, ligands, protein, show):
             spine.set_color('black') 
             spine.set_linewidth(1.25)
         plt.tight_layout()
-        plt.savefig(f'{protein}_{ligand}_bargraph.png', dpi=300)
+        plt.savefig(f'{protein}_{ligand}_{interaction}_bargraph.png', dpi=300)
         if show:
             plt.show()
 
@@ -229,9 +229,9 @@ def process_interaction_data(csv_file, pdb_file, interaction, ignore_chain, show
     interaction_df = create_interaction_dataframe(interaction_counts)
     sorted_residues = sort_residues(interaction_df, residue_order)
     if graph == 'heatmap':
-        heatmap(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show, total_residue_counts, bar)
+        heatmap(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show, total_residue_counts, bar, interaction)
     elif graph == 'bar':
-        bar_graph(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show)
+        bar_graph(interaction_df, sorted_residues, df['Ligand'].unique(), protein, show, interaction)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
