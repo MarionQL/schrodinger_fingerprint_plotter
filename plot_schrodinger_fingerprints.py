@@ -218,6 +218,12 @@ def process_interaction_data(csv_file, pdb_file, interaction, ignore_chain, show
     '''
     df = load_data(csv_file)
     df = extract_ligand(df)
+    if interaction == "all" or interaction is None:
+        for inter in ["contact", "backbone", "sidechain", "polar", "hydrophobic",
+                      "acceptor", "donor", "aromatic", "charged"]:
+            print(f"\n Processing {inter} interactions")
+            process_interaction_data(csv_file, pdb_file, inter, ignore_chain, show, graph, bar)
+        return
     contact_columns = filter_columns(df, interaction)
     filename = os.path.basename(csv_file)
     protein = filename.split('_')[0]  # assumes format: protein_ligand_data.csv
@@ -253,8 +259,8 @@ if __name__ == "__main__":
     parser.add_argument("csv_file", type=str, help="Path to CSV")
     parser.add_argument("pdb_file", type=str, help="Path to PDB file with protein")
     parser.add_argument("-i", "--interaction", type=str, choices=["contact", "backbone", "sidechain", "polar", "hydrophobic", 
-                                                                  "acceptor", "donor", "aromatic", "charged"],
-        help="Type of interaction to plot")
+                                                                  "acceptor", "donor", "aromatic", "charged", "all"],
+        help="Type of interaction to plot. The all option will run all interaction types")
     parser.add_argument("-g", "--graph", type=str, choices=["bar", "heatmap"], help="Type of graph")
     parser.add_argument('-ic', "--ignore-chain", action="store_true", help="Ignore chain IDs in residue labels.")
     parser.add_argument("-s", "--show", action="store_true", help="Shows the plots as they are plotted in Matplotlib") 
