@@ -27,6 +27,7 @@ To run this script you need two things
     - The script uses this protein file to extract residue names and is used to order the residue labels
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
 
+3. This script is compatible with python 3 and up
 Flags:
 
 Required:
