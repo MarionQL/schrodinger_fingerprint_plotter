@@ -19,6 +19,7 @@ To run this script you need two things
       3. {ligand}
       4. {protein}_{ligand}
    * NOTE: Pose number must be an integer (not pose1, pose2, pose3)
+   * NOTE: The ligand name must not be an integer, but it can contain integers
    - this file should also be named {protein}_rest_of_csv.csv
       1. this is so that file outputs can be named with the protein name they are associated
 
