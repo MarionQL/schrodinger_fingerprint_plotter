@@ -29,8 +29,8 @@ To run this script you need three things
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
 
 3. We need to create a conda environment. To do this type the following into the command line: conda create -n fingerprints python=3.11 numpy=1.26 pandas seaborn matplotlib
-   You only need to do that first command once, once you have created the environment, all you have to do is type: conda activate fingerprints
-   This will activate the conda environment we created with the first command.
+   - You only need to do that first command once, once you have created the environment, all you have to do is type: conda activate fingerprints
+   - This will activate the conda environment we created with the first command.
 Flags:
 
 Required:
