@@ -31,6 +31,7 @@ To run this script you need three things
 3. We need to create a conda environment. To do this type the following into the command line: conda create -n fingerprints python=3.11 numpy=1.26 pandas seaborn matplotlib
    - You only need to do that first command once, once you have created the environment, all you have to do is type: conda activate fingerprints
    - This will activate the conda environment we created with the first command.
+
 Flags:
 
 Required:
