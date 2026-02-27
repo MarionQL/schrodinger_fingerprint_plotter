@@ -9,7 +9,7 @@ This code:
 5. Counts interaction frequencies for each ligand-residue pair
 6. Generates bar plots and heatmaps for selected interaction types
 
-To run this script you need two things
+To run this script you need three things
 1. The CSV from schrodinger
    - this csv can have as many ligands as you want
    - if you make a heatmap, all ligands will be included, if you make a bar graph, each ligand will be placed in its own bargraph
@@ -28,7 +28,9 @@ To run this script you need two things
     - The script uses this protein file to extract residue names and is used to order the residue labels
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
 
-3. This script is compatible with python 3 and up
+3. We need to create a conda environment. To do this type the following into the command line: conda create -n fingerprints python=3.11 numpy=1.26 pandas seaborn matplotlib
+   You only need to do that first command once, once you have created the environment, all you have to do is type: conda activate fingerprints
+   This will activate the conda environment we created with the first command.
 Flags:
 
 Required:
