@@ -11,7 +11,7 @@ This code:
 
 To run this script you need three things
 1. The CSV from schrodinger (this script only accepts 1 csv file)
-   - this csv can have as many ligands as you want
+   - **this csv can have as many ligands as you want**
    - if you make a heatmap, all ligands will be included, if you make a bar graph, each ligand will be placed in its own bargraph
    - In order to identify ligand names, the first column of the CSV must be in the following format:
       1. `{protein}_{ligand}_{pose_number}`
