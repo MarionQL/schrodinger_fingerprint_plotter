@@ -52,5 +52,14 @@ These are the commands used to generate those graphs:
 
 `python plot_schrodinger_fingerprints.py mfsd2b_fingerprint.csv mfsd2b.pdb -i contact -g heatmap -ic`
 
-Aesthetic Issues:
-If you have a long ligand name or many residue contacts, sometimes the size of the figure might not be wide enough. If this is an issue and labels are getting cut off, try increaseing the figure size in either the heatmap or bar graph functions depending on which graph you are having trouble with. The line you edit is this: plt.figure(figsize=(12, 8)) - to make the figure wider, change 12 to a larger number
+**Aesthetic Issues:**
+
+If you come across something similar to this error:
+
+**ValueError: The number of FixedLocator locations (51), usually from a call to set_ticks, does not match the number of labels (101).**
+
+or
+
+If you have a long ligand name or many residue contacts, sometimes the size of the figure might not be wide enough. 
+
+If this is an issue and labels are getting cut off, try increaseing the figure size in either the heatmap or bar graph functions depending on which graph you are having trouble with. The line you edit is this: **plt.figure(figsize=(12, 8))** - to make the figure wider, **change 12 to a larger number**
