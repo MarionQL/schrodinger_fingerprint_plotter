@@ -10,7 +10,7 @@ This code:
 6. Generates bar plots and heatmaps for selected interaction types
 
 To run this script you need three things
-1. The CSV from schrodinger
+1. The CSV from schrodinger (this script only accepts 1 csv file)
    - this csv can have as many ligands as you want
    - if you make a heatmap, all ligands will be included, if you make a bar graph, each ligand will be placed in its own bargraph
    - In order to identify ligand names, the first column of the CSV must be in the following format:
@@ -23,7 +23,7 @@ To run this script you need three things
    - this file should also be named {protein}_rest_of_csv.csv
       1. this is so that file outputs can be named with the protein name they are associated
 
-2. The PDB of your protein
+2. The PDB of your protein (this script only accepts 1 protein pdb file)
 
     - The script uses this protein file to extract residue names and is used to order the residue labels
     - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
