@@ -7,8 +7,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import argparse
 import re
-import dataclasses import dataclass
+from dataclasses import dataclass
 from pathlib import Path
+from difflib import SequenceMatcher
 
 INTERACTIONS = [
     "contact", "backbone", "sidechain", "polar", "hydrophobic",
@@ -357,9 +358,8 @@ def count_interactions(df, contact_columns, residue_mapping):
     interaction_counts = {}
     total_residue_counts = {}
 
-    first_col = contact_columns[0]
-    first_val = df[first_col].iloc[1]
-    binary_format = isinstance(float(first_val), (int, float)) and float(first_val) in [0, 1]
+    binary_format = detect_binary_format(df, contact_columns)
+
     for _, row in df.iterrows():
         ligand = row['Ligand']
         for col in contact_columns:
@@ -369,13 +369,13 @@ def count_interactions(df, contact_columns, residue_mapping):
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
-                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) +1
+                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) + 1
             else:
                 if pd.notna(value) and str(value).strip() != '':
                     residue_key = col.split('_')[0]
                     formatted_residue = residue_mapping.get(residue_key, residue_key)
                     interaction_counts[(ligand, formatted_residue)] = interaction_counts.get((ligand, formatted_residue), 0) + 1
-                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) +1
+                    total_residue_counts[formatted_residue] = total_residue_counts.get(formatted_residue, 0) + 1
     return interaction_counts, total_residue_counts
 
 def merge_count_dicts(
