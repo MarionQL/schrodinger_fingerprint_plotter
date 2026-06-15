@@ -1,65 +1,147 @@
-# schrodinger_fingerprint_plotter
-Visualizing the csv output from Schrodinger interaction fingerprints as a heatmap (multiple ligands) or bar graph (single ligand).
+# Schrodinger Fingerprint Plotter
 
-This code:
-1. Parses Schrodinger fingerprint CSVs containing interaction data across multiple ligand poses and accross multiple ligands
+Visualize Schrodinger interaction fingerprint CSVs as heatmaps or bar graphs across multiple ligands and protein conformations.
+
+---
+
+## What This Script Does
+
+1. Parses one or more Schrodinger fingerprint CSVs containing interaction data across multiple ligand poses
 2. Extracts ligand names from common naming patterns in the first column
-3. Can filter for certain interaction types identified by schrodinger
-4. Maps residue labels using an input PDB file (this is the protein that you docked your ligands to)
-5. Counts interaction frequencies for each ligand-residue pair
-6. Generates bar plots and heatmaps for selected interaction types
+3. Filters for specific interaction types identified by Schrodinger
+4. Maps and aligns residue labels using input PDB files — supports multiple PDBs with different residue numbering via sequence-similarity alignment
+5. Counts interaction frequencies for each ligand–residue pair across all input files
+6. Generates heatmaps or bar graphs for selected interaction types
 
-To run this script you need three things
-1. The CSV from schrodinger (this script only accepts 1 csv file)
-   - **this csv can have as many ligands as you want**
-   - if you make a heatmap, all ligands will be included, if you make a bar graph, each ligand will be placed in its own bargraph
-   - In order to identify ligand names, the first column of the CSV must be in the following format:
-      1. `{protein}_{ligand}_{pose_number}`
-      2. {ligand}_{pose_number}
-      3. {ligand}
-      4. {protein}_{ligand}
-   * NOTE: Pose number must be an integer (not pose1, pose2, pose3)
-   * NOTE: The ligand name must not be an integer, but it can contain integers
-   - this file should also be named {protein}_rest_of_csv.csv
-      1. this is so that file outputs can be named with the protein name they are associated
+---
 
-2. The PDB of your protein (this script only accepts 1 protein pdb file)
+## Requirements
 
-    - The script uses this protein file to extract residue names and is used to order the residue labels
-    - The schrodinger output only includes the chain ID and the residue number, so that is why we need the pdb of the protein
+Create a conda environment with the required packages (only needs to be done once):
 
-3. We need to create a conda environment. To do this type the following into the command line: conda create -n fingerprints python=3.11 numpy=1.26 pandas seaborn matplotlib
-   - You only need to do that first command once, once you have created the environment, all you have to do is type: conda activate fingerprints
-   - This will activate the conda environment we created with the first command.
+```bash
+conda create -n fingerprints python=3.11 numpy=1.26 pandas seaborn matplotlib
+```
 
-Flags:
+Then activate it each time before running:
 
-Required:
+```bash
+conda activate fingerprints
+```
 
-1. -i --interaction: this filters for different interactions, contact will give you all interactions, you can also get backbone or sidechain, or interaction type (polar, charged, donor, acceptor, hydrophobic, aromatic, all)
-  - these interactions are all determined by schrodinger, so if there are errors in interaction type, there may be a problem with how you ran fingerprinting in Schrodinger.
-  - All is a special interaction type that will tell the script to run all interaction types in one command. 
-2. -g --graph: You can choose to generate a heatmap or a bar graph, examples of what these options look like are in the example_data folder
+---
 
-Optional:
-1. -ic --ignore-chain: this flag will remove the chain letter from the residue name in the graph, this is not recommended if the protein has multiple chains
-2. -s --show: this will show the graph in matplotlib as the graphs are created
+## Inputs
 
-In the example_data folder, there is a protein.pdb and a fingerprint.csv that work with this script and the heatmap and bar graphs that are output
-These are the commands used to generate those graphs:
+### CSV Files (`-c`)
+One or more Schrodinger fingerprint CSV files. Each CSV is paired with a PDB at the same position — order matters.
 
-`python plot_schrodinger_fingerprints.py mfsd2b_fingerprint.csv mfsd2b.pdb -i contact -g bar -ic`
+- A CSV can contain as many ligands as you want
+- The **first column** must follow one of these naming patterns:
+  | Format | Example |
+  |--------|---------|
+  | `{protein}_{ligand}_{pose_number}` | `mfsd2b_compA_1` |
+  | `{ligand}_{pose_number}` | `compA_1` |
+  | `{ligand}` | `compA` |
+  | `{protein}_{ligand}` | `mfsd2b_compA` |
 
-`python plot_schrodinger_fingerprints.py mfsd2b_fingerprint.csv mfsd2b.pdb -i contact -g heatmap -ic`
+  > **Note:** Pose number must be an integer (`1`, `2`, `3` — not `pose1`, `pose2`)  
+  > **Note:** The ligand name must not be a plain integer, but it can contain integers
 
-**Aesthetic Issues:**
+### PDB Files (`-p`)
+One or more protein PDB files, paired to the CSVs by position.
 
-If you come across something similar to this error:
+- Used to extract residue names and ordering for the x-axis labels
+- The **first PDB is the reference** — all other PDBs are aligned to it by residue-name sequence similarity, so shifted numbering or missing residues across conformations are handled automatically
 
-**ValueError: The number of FixedLocator locations (51), usually from a call to set_ticks, does not match the number of labels (101).**
+---
 
-or
+## Flags
 
-If you have a long ligand name or many residue contacts, sometimes the size of the figure might not be wide enough. 
+### Required
 
-If this is an issue and labels are getting cut off, try increaseing the figure size in either the heatmap or bar graph functions depending on which graph you are having trouble with. The line you edit is this: **plt.figure(figsize=(12, 8))** - to make the figure wider, **change 12 to a larger number**
+| Flag | Description |
+|------|-------------|
+| `-c`, `--csv-files` | One or more fingerprint CSV files |
+| `-p`, `--pdb-files` | One or more PDB files (must match CSV count and order) |
+| `-i`, `--interaction` | Interaction type to plot (see options below) |
+| `-g`, `--graph` | Graph type: `heatmap` or `bar` |
+
+**Interaction types** (`-i`):
+`contact` · `backbone` · `sidechain` · `polar` · `hydrophobic` · `acceptor` · `donor` · `aromatic` · `charged` · `all`
+
+> `all` runs every interaction type in sequence, producing a separate output file for each.
+
+### Optional
+
+| Flag | Description |
+|------|-------------|
+| `-ic`, `--ignore-chain` | Remove chain letter from residue labels — not recommended for multi-chain proteins |
+| `-s`, `--show` | Display each plot interactively in matplotlib as it's generated |
+| `-bar`, `--bar` | Add a bar graph of total interaction propensity above the heatmap |
+| `-l`, `--ligands` | Filter to specific ligands by name (space-separated). If omitted, all ligands are plotted |
+| `--prefix-ligand-with-source` | Prefix ligand labels with the CSV filename — useful when the same ligand appears in multiple CSVs and you want separate heatmap rows instead of pooled counts |
+| `--order-ligands-by-name` | Order heatmap/bar rows alphabetically by ligand name instead of input order |
+| `--min-residue-interactions` | Exclude residues with fewer than N total interactions across all ligands |
+
+---
+
+## Usage Examples
+
+**Single CSV/PDB pair — heatmap:**
+```bash
+python plot_schrodinger_fingerprints.py \
+  -c mfsd2b_fingerprint.csv \
+  -p mfsd2b.pdb \
+  -i contact -g heatmap -ic
+```
+
+**Single CSV/PDB pair — bar graph:**
+```bash
+python plot_schrodinger_fingerprints.py \
+  -c mfsd2b_fingerprint.csv \
+  -p mfsd2b.pdb \
+  -i contact -g bar -ic
+```
+
+**Multiple CSV/PDB pairs — pooled heatmap with interaction bar on top:**
+```bash
+python plot_schrodinger_fingerprints.py \
+  -c conf1_fp.csv conf2_fp.csv conf3_fp.csv \
+  -p conf1.pdb conf2.pdb conf3.pdb \
+  -i contact -g heatmap -bar
+```
+
+**Filter to specific ligands, minimum interaction threshold:**
+```bash
+python plot_schrodinger_fingerprints.py \
+  -c protein_fp.csv \
+  -p protein.pdb \
+  -i polar -g heatmap \
+  -l compA compB \
+  --min-residue-interactions 5
+```
+
+---
+
+## Output
+
+Output files are named automatically:
+
+- **Heatmap:** `{protein}_{interaction}_interaction_heatmap.png`
+- **Bar graph:** `{protein}_{ligand}_{interaction}_bargraph.png`
+
+The protein name is taken from the stem of the first CSV file (everything before the first `_`).
+
+---
+
+## Troubleshooting
+
+**`ValueError: The number of FixedLocator locations (...) does not match the number of labels (...)`**  
+or labels/axes are getting cut off:
+
+Increase the figure size in the `heatmap` or `bar_graph` function. Find this line and increase the first number (width):
+
+```python
+plt.figure(figsize=(12, 8))  # change 12 to a larger value
+```
