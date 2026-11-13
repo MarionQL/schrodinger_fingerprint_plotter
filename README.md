@@ -79,6 +79,7 @@ One or more protein PDB files, paired to the CSVs by position.
 | `-ic`, `--ignore-chain` | Remove chain letter from residue labels — not recommended for multi-chain proteins |
 | `-s`, `--show` | Display each plot interactively in matplotlib as it's generated |
 | `-bar`, `--bar` | Add a bar graph of total interaction propensity above the heatmap |
+| `--percentage` | Show interaction frequency (% of evaluated poses) instead of raw counts (default). The top bar uses all evaluated poses. |
 | `-l`, `--ligands` | Filter to specific ligands by name (space-separated). If omitted, all ligands are plotted |
 | `--prefix-ligand-with-source` | Prefix ligand labels with the CSV filename — useful when the same ligand appears in multiple CSVs and you want separate heatmap rows instead of pooled counts |
 | `--order-ligands-by-name` | Order heatmap/bar rows alphabetically by ligand name instead of input order |
@@ -94,6 +95,14 @@ python plot_schrodinger_fingerprints.py \
   -c mfsd2b_fingerprint.csv \
   -p mfsd2b.pdb \
   -i contact -g heatmap -ic
+```
+
+**Percentage heatmap with top bar:**
+```bash
+python plot_schrodinger_fingerprints.py \
+  -c mfsd2b_fingerprint.csv \
+  -p mfsd2b.pdb \
+  -i contact -g heatmap -bar --percentage
 ```
 
 **Single CSV/PDB pair — bar graph:**
@@ -130,6 +139,7 @@ Output files are named automatically:
 
 - **Heatmap:** `{protein}_{interaction}_interaction_heatmap.png`
 - **Bar graph:** `{protein}_{ligand}_{interaction}_bargraph.png`
+- **Percentage mode:** the same names with `_percentage` before `.png`
 
 The protein name is taken from the stem of the first CSV file (everything before the first `_`).
 
