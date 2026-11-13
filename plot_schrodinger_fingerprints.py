@@ -409,7 +409,7 @@ def sort_residues(
         key=lambda label: residue_order.get(label, ("", float("inf"), "")),
     )
 
-def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_residue_counts, bar, interaction):
+def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_residue_counts, bar, interaction, percentage=False):
     '''creates and saves a heatmap from the interaction df with correctly sorted x-ticks
     arg: interaction_df is the dataframe with the interaction counts
     arg: sorted_residues (list) is the residue labels in order
@@ -424,6 +424,8 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_resid
     ax = sns.heatmap(
         heatmap_data, 
         cmap='Blues', 
+        vmin=0 if percentage else None,
+        vmax=100 if percentage else None,
         annot=False, 
         fmt='.0f', 
         square=True, 
@@ -431,7 +433,8 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_resid
             'orientation': 'horizontal', 
             'shrink': 0.6, 
             'location': 'bottom', 
-            'pad': 0.25
+            'pad': 0.25,
+            'label': 'Interaction frequency (%)' if percentage else 'Interaction count'
         }
     )
     cbar = ax.collections[0].colorbar
@@ -460,13 +463,17 @@ def heatmap(interaction_df, sorted_residues, ligands, protein, show, total_resid
         bar_ax.set_xticks([])
         bar_ax.set_yticks([])
         bar_ax.set_xlim(-0.5, len(sorted_residues)-0.5)
+        if percentage:
+            bar_ax.set_ylim(0, 100)
+            bar_ax.set_ylabel('Frequency (%)')
 
     plt.tight_layout()
-    plt.savefig(f'{protein}_{interaction}_interaction_heatmap.png', dpi=300)
+    suffix = '_percentage' if percentage else ''
+    plt.savefig(f'{protein}_{interaction}_interaction_heatmap{suffix}.png', dpi=300)
     if show:
         plt.show()
 
-def bar_graph(interaction_df, sorted_residues, ligands, protein, show, interaction):
+def bar_graph(interaction_df, sorted_residues, ligands, protein, show, interaction, percentage=False):
     '''its a bar graph
     arg: interaction_df is the dataframe with the interaction counts
     arg: sorted_residues (list) is the residue labels in order
@@ -487,15 +494,16 @@ def bar_graph(interaction_df, sorted_residues, ligands, protein, show, interacti
         plt.xticks(rotation=90, fontsize=16)
         plt.yticks(fontsize=16)
         ax.set_xticklabels(sorted_residues, fontsize=16)  
-        plt.ylabel('Interaction Count', fontsize=18, fontweight='bold')
+        plt.ylabel('Interaction Frequency (%)' if percentage else 'Interaction Count', fontsize=18, fontweight='bold')
         plt.xlabel('Residue', fontsize=18, fontweight='bold')
-        plt.title(f'Interaction Count per Residue - {ligand}', fontsize=20, fontweight='bold')
+        plt.title(f'Interaction {"Frequency (%)" if percentage else "Count"} per Residue - {ligand}', fontsize=20, fontweight='bold')
         for _, spine in ax.spines.items():
             spine.set_visible(True)  
             spine.set_color('black') 
             spine.set_linewidth(1.25)
         plt.tight_layout()
-        plt.savefig(f'{protein}_{ligand}_{interaction}_bargraph.png', dpi=300)
+        suffix = '_percentage' if percentage else ''
+        plt.savefig(f'{protein}_{ligand}_{interaction}_bargraph{suffix}.png', dpi=300)
         if show:
             plt.show()
 def sort_ligands_by_name(ligands: list[str]) -> list[str]:
@@ -528,6 +536,7 @@ def process_single_interaction_for_pairs(
     prefix_ligand_with_source: bool = False,
     order_ligands_by_name: bool = False,
     min_residue_interactions: int = 0,
+    percentage: bool = False,
 ):
     if len(csv_files) != len(pdb_files):
         raise ValueError(
@@ -542,6 +551,7 @@ def process_single_interaction_for_pairs(
 
     all_interaction_counts = {}
     all_total_residue_counts = {}
+    ligand_pose_counts = {}
     ligand_order = []
 
     for pair_i, (csv_file, residue_map) in enumerate(zip(csv_files, residue_maps), start=1):
@@ -561,6 +571,10 @@ def process_single_interaction_for_pairs(
         if not contact_columns:
             print(f"Warning: no columns found for interaction '{interaction}' in {csv_file}")
             continue
+
+        if percentage:
+            for ligand, n in df['Ligand'].value_counts().items():
+                ligand_pose_counts[ligand] = ligand_pose_counts.get(ligand, 0) + n
 
         interaction_counts, total_residue_counts = count_interactions(
             df=df,
@@ -594,6 +608,11 @@ def process_single_interaction_for_pairs(
                 f"{min_residue_interactions} for {interaction}"
             )
             return
+    if percentage:
+        interaction_df['Count'] = interaction_df['Count'] * 100 / interaction_df['Ligand'].map(ligand_pose_counts)
+        total_poses = sum(ligand_pose_counts.values())
+        all_total_residue_counts = {res: n * 100 / total_poses for res, n in all_total_residue_counts.items()}
+
     if order_ligands_by_name:
         ligand_order = sort_ligands_by_name(ligand_order)
 
@@ -609,6 +628,7 @@ def process_single_interaction_for_pairs(
             total_residue_counts=all_total_residue_counts,
             bar=bar,
             interaction=interaction,
+            percentage=percentage,
         )
 
     elif graph == "bar":
@@ -619,6 +639,7 @@ def process_single_interaction_for_pairs(
             protein=protein,
             show=show,
             interaction=interaction,
+            percentage=percentage,
         )
 
 def process_interaction_data(
@@ -633,6 +654,7 @@ def process_interaction_data(
     prefix_ligand_with_source: bool = False,
     order_ligands_by_name: bool = False,
     min_residue_interactions: int = 0,
+    percentage: bool = False,
 ):
     if interaction == "all" or interaction is None:
         for inter in INTERACTIONS:
@@ -649,6 +671,7 @@ def process_interaction_data(
                 prefix_ligand_with_source=prefix_ligand_with_source,
                 order_ligands_by_name=order_ligands_by_name,
                 min_residue_interactions=min_residue_interactions,
+                percentage=percentage,
             )
         return
 
@@ -664,6 +687,7 @@ def process_interaction_data(
         prefix_ligand_with_source=prefix_ligand_with_source,
         order_ligands_by_name=order_ligands_by_name,
         min_residue_interactions=min_residue_interactions,
+        percentage=percentage,
     )
 
 
@@ -762,6 +786,10 @@ if __name__ == "__main__":
             "across all plotted ligands/proteins."
         ),
     )
+    parser.add_argument(
+        '--percentage', action='store_true',
+        help='Plot interaction frequency as a percentage of evaluated poses (default: raw counts).',
+    )
     args = parser.parse_args()
 
     process_interaction_data(
@@ -776,4 +804,5 @@ if __name__ == "__main__":
         prefix_ligand_with_source=args.prefix_ligand_with_source,
         order_ligands_by_name=args.order_ligands_by_name,
         min_residue_interactions=args.min_residue_interactions,
+        percentage=args.percentage,
     )
